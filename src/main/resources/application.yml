@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: tm
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2console/
+
+
+server:
+  port: 8080
+
+
+
+
