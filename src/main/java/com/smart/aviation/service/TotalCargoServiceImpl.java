@@ -14,9 +14,9 @@ import java.util.List;
 @AllArgsConstructor
 public class TotalCargoServiceImpl implements TotalCargoService {
 
-    TotalCargoDao totalCargoDao;
-    CargoService cargoService;
-    BaggageService baggageService;
+    private final TotalCargoDao totalCargoDao;
+    private final CargoService cargoService;
+    private final BaggageService baggageService;
 
 
     public void createTotalCargo(TotalCargoDto totalCargoDto) {
