@@ -28,11 +28,11 @@ public class CargoServiceImpl implements CargoService{
 
     public List<Cargo> addCargos(TotalCargoDto totalCargoDto) {
         List<Cargo> cargo = new ArrayList<>();
-        CargoDto[] cargoTest = totalCargoDto.getCargo();
-        for (CargoDto cargoDto : cargoTest) {
-            Cargo cargoObj = createCargo(cargoDto);
+        List<CargoDto> cargoListFromTotalCargo = totalCargoDto.getCargo();
+        cargoListFromTotalCargo.forEach(c -> {
+            Cargo cargoObj = createCargo(c);
             cargo.add(cargoObj);
-        }
+        });
         return cargo;
     }
 

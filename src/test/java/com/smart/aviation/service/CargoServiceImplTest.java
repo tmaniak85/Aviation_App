@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -59,9 +60,10 @@ class CargoServiceImplTest {
     @Test
     void shouldCreateListOfCargosFromTotalCargo() {
 //        given
-        CargoDto[] arrayCargoDto = {cargoDto};
+        List<CargoDto> cargoDtoListForTotalCargo = new ArrayList<>();
+        cargoDtoListForTotalCargo.add(cargoDto);
         TotalCargoDto totalCargoDto = new TotalCargoDto();
-        totalCargoDto.setCargo(arrayCargoDto);
+        totalCargoDto.setCargo(cargoDtoListForTotalCargo);
         CargoService cargoService = new CargoServiceImpl(cargoDao);
         when(cargoDao.save(cargo)).thenReturn(cargo);
 //        when

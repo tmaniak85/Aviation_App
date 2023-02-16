@@ -9,6 +9,6 @@ public class TotalCargoDto {
 
     private Long flightId;
     private List<BaggageDto> baggage;
-    private CargoDto[] cargo;
+    private List<CargoDto> cargo;
 
 }
