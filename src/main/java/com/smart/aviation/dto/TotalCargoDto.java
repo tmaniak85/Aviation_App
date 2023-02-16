@@ -2,11 +2,13 @@ package com.smart.aviation.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class TotalCargoDto {
 
     private Long flightId;
-    private BaggageDto[] baggage;
+    private List<BaggageDto> baggage;
     private CargoDto[] cargo;
 
 }

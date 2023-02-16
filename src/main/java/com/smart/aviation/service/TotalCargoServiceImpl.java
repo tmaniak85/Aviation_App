@@ -24,7 +24,7 @@ public class TotalCargoServiceImpl implements TotalCargoService {
         totalCargo.setFlightId(totalCargoDto.getFlightId());
         List<Cargo> cargo = new ArrayList<>(cargoService.addCargos(totalCargoDto));
         totalCargo.setCargo(cargo);
-        List<Baggage> baggage = new ArrayList<>(baggageService.addBaggages(totalCargoDto));
+        List<Baggage> baggage = new ArrayList<>(baggageService.addBaggage(totalCargoDto));
         totalCargo.setBaggage(baggage);
         totalCargoDao.save(totalCargo);
     }

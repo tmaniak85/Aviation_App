@@ -15,7 +15,6 @@ public class BaggageServiceImpl implements BaggageService{
 
     BaggageDao baggageDao;
 
-
     public Baggage createBaggage(BaggageDto baggageDto) {
         Baggage baggage = new Baggage();
         baggage.setId(baggageDto.getId());
@@ -25,14 +24,13 @@ public class BaggageServiceImpl implements BaggageService{
         return baggageDao.save(baggage);
     }
 
-    public List<Baggage> addBaggages(TotalCargoDto totalCargoDto) {
+    public List<Baggage> addBaggage(TotalCargoDto totalCargoDto) {
         List<Baggage> baggage = new ArrayList<>();
-        BaggageDto[] baggageTest = totalCargoDto.getBaggage();
-        for(BaggageDto baggageDto : baggageTest) {
-            Baggage baggageObj = createBaggage(baggageDto);
+        List<BaggageDto> baggageListFromTotalCargo = totalCargoDto.getBaggage();
+        baggageListFromTotalCargo.forEach(b -> {
+            Baggage baggageObj = createBaggage(b);
             baggage.add(baggageObj);
-        }
+        });
         return baggage;
     }
-
 }

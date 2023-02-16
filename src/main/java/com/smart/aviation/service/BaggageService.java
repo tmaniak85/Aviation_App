@@ -8,6 +8,6 @@ import java.util.List;
 public interface BaggageService {
 
     Baggage createBaggage(BaggageDto baggageDto);
-    List<Baggage> addBaggages(TotalCargoDto totalCargoDto);
+    List<Baggage> addBaggage(TotalCargoDto totalCargoDto);
 
 }

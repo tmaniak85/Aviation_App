@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -57,21 +58,22 @@ class BaggageServiceImplTest {
     }
 
     @Test
-    void shouldCreateListOfBaggagesFromTotalCargo() {
+    void shouldCreateListOfBaggageFromTotalCargo() {
 //        given
-        BaggageDto[] arrayBaggageDto = {baggageDto};
+        List<BaggageDto> baggageDtoListForTotalCargo = new ArrayList<>();
+        baggageDtoListForTotalCargo.add(baggageDto);
         TotalCargoDto totalCargoDto = new TotalCargoDto();
-        totalCargoDto.setBaggage(arrayBaggageDto);
+        totalCargoDto.setBaggage(baggageDtoListForTotalCargo);
         BaggageService baggageService = new BaggageServiceImpl(baggageDao);
         when(baggageDao.save(baggage)).thenReturn(baggage);
 //        when
-        List<Baggage> baggages = baggageService.addBaggages(totalCargoDto);
+        List<Baggage> baggageList = baggageService.addBaggage(totalCargoDto);
 //        then
-        assertThat(baggages, hasSize(1));
-        assertThat(baggages.get(0).getId(), equalTo(baggageDto.getId()));
-        assertThat(baggages.get(0).getWeightUnit(), equalTo(baggageDto.getWeightUnit()));
-        assertThat(baggages.get(0).getWeight(), equalTo(baggageDto.getWeight()));
-        assertThat(baggages.get(0).getPieces(), equalTo(baggageDto.getPieces()));
+        assertThat(baggageList, hasSize(1));
+        assertThat(baggageList.get(0).getId(), equalTo(baggageDto.getId()));
+        assertThat(baggageList.get(0).getWeightUnit(), equalTo(baggageDto.getWeightUnit()));
+        assertThat(baggageList.get(0).getWeight(), equalTo(baggageDto.getWeight()));
+        assertThat(baggageList.get(0).getPieces(), equalTo(baggageDto.getPieces()));
     }
 
 }
