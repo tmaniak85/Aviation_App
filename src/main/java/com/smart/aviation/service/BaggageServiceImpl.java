@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class BaggageServiceImpl implements BaggageService{
 
-    BaggageDao baggageDao;
+    private final BaggageDao baggageDao;
 
     public Baggage createBaggage(BaggageDto baggageDto) {
         Baggage baggage = new Baggage();

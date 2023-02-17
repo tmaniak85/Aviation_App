@@ -14,8 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CargoServiceImpl implements CargoService{
 
-    CargoDao cargoDao;
-
+    private final CargoDao cargoDao;
 
     public Cargo createCargo(CargoDto cargoDto) {
         Cargo cargo = new Cargo();

@@ -34,5 +34,4 @@ public class TotalCargoServiceImpl implements TotalCargoService {
             createTotalCargo(cargoDto);
         }
     }
-
 }
