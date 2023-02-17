@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -48,21 +49,16 @@ public class FlightServiceImpl implements FlightService {
 
         double totalCargosWeightInKg = 0;
         double totalBaggageWeightInKg = 0;
-        boolean ifFlightExists = false;
 
-        for (Flight flightOnCertainDate : flights) {
-            if (flightOnCertainDate.getDepartureDate().getYear() == requestedDepartureDate.getYear()
-                    && flightOnCertainDate.getDepartureDate().getMonth() == requestedDepartureDate.getMonth()
-                    && flightOnCertainDate.getDepartureDate().getDayOfMonth() == requestedDepartureDate.getDayOfMonth()) {
+        flights = getFlightsOnCertainDate(flights, requestedDepartureDate);
 
-                ifFlightExists = true;
+        if (flights.size() > 0) {
+            for (Flight flightOnCertainDate : flights) {
                 TotalCargo totalCargo = getTotalCargoOnCertainDate(flightOnCertainDate);
                 totalCargosWeightInKg += getTotalCargosWeightInKg(totalCargosWeightInKg, totalCargo);
                 totalBaggageWeightInKg += getTotalBaggageWeightInKg(totalBaggageWeightInKg, totalCargo);
             }
-        }
-
-        if (!ifFlightExists) {
+        } else {
             throw new NoFlightOnRequestedDateException("C003-Flight number on requested date does not exist");
         }
 
@@ -73,42 +69,22 @@ public class FlightServiceImpl implements FlightService {
 
     public AirportFlightsAndCargoPieces showNumberOfFlightsAndBaggageInPiecesForAirportAndDate(String iataAirportCode, DepartureDateDto departureDateDto) {
 
-        List<Flight> flights = flightDao.findAllByArrivalAirportIATACodeIsOrDepartureAirportIATACodeIs(iataAirportCode, iataAirportCode);
-
-        if (flights.size() == 0) {
-            throw new IataAirportCodeDoesNotExistInDatabaseException("C004-Iata airport code does not exist in database");
-        }
-
+        List<Flight> flights = getFlightsWithRequiredArrivalAndDepartureIATACode(iataAirportCode);
         LocalDate requestedDepartureDate = convertJsonToLocalDate(departureDateDto);
 
-        int numberOfDepartingFlights = 0;
-        int numberOfArrivingFlights = 0;
-        int numberOfArrivingBaggageInPieces = 0;
-        int numberOfDepartingBaggageInPieces = 0;
-        boolean ifFlightExists = false;
+        int numberOfDepartingFlights;
+        int numberOfArrivingFlights;
+        int numberOfArrivingBaggageInPieces;
+        int numberOfDepartingBaggageInPieces;
 
-        for (Flight flightOnCertainDate : flights) {
-            if (flightOnCertainDate.getDepartureDate().getYear() == requestedDepartureDate.getYear()
-                    && flightOnCertainDate.getDepartureDate().getMonth() == requestedDepartureDate.getMonth()
-                    && flightOnCertainDate.getDepartureDate().getDayOfMonth() == requestedDepartureDate.getDayOfMonth()) {
+        flights = getFlightsOnCertainDate(flights, requestedDepartureDate);
 
-                ifFlightExists = true;
-                TotalCargo totalCargo = flightOnCertainDate.getTotalCargo();
-
-
-                if (flightOnCertainDate.getArrivalAirportIATACode().equals(iataAirportCode)) {
-                    numberOfArrivingFlights++;
-                    numberOfArrivingBaggageInPieces += getNumberOfBaggageInPieces(totalCargo).orElse(0);
-                }
-
-                if (flightOnCertainDate.getDepartureAirportIATACode().equals(iataAirportCode)) {
-                    numberOfDepartingFlights++;
-                    numberOfDepartingBaggageInPieces += getNumberOfBaggageInPieces(totalCargo).orElse(0);
-                }
-            }
-        }
-
-        if (!ifFlightExists) {
+        if (flights.size() > 0) {
+            numberOfArrivingFlights = getNumberOfArrivingFlightsForIATACode(iataAirportCode, flights);
+            numberOfArrivingBaggageInPieces = getNumberOfArrivingBaggageInPiecesForIATACode(iataAirportCode, flights);
+            numberOfDepartingFlights = getNumberOfDepartingFlightsForIATACode(iataAirportCode, flights);
+            numberOfDepartingBaggageInPieces = getNumberOfDepartingBaggageInPiecesForIATACode(iataAirportCode, flights);
+        } else {
             throw new NoFlightOnRequestedDateException("C003-Flight number and cargo on requested date does not exist");
         }
 
@@ -121,6 +97,21 @@ public class FlightServiceImpl implements FlightService {
 
         if (flights.size() == 0) {
             throw new FlightNumberDoesNotExistException("C001-Flight number does not exist in database");
+        }
+        return flights;
+    }
+
+    private List<Flight> getFlightsOnCertainDate(List<Flight> flights, LocalDate requestedDepartureDate) {
+        return flights.stream().filter(flight -> flight.getDepartureDate().getYear() == requestedDepartureDate.getYear()
+                && flight.getDepartureDate().getMonth() == requestedDepartureDate.getMonth()
+                && flight.getDepartureDate().getDayOfMonth() == requestedDepartureDate.getDayOfMonth()).collect(Collectors.toList());
+    }
+
+    private List<Flight> getFlightsWithRequiredArrivalAndDepartureIATACode(String iataAirportCode) {
+        List<Flight> flights = flightDao.findAllByArrivalAirportIATACodeIsOrDepartureAirportIATACodeIs(iataAirportCode, iataAirportCode);
+
+        if (flights.size() == 0) {
+            throw new IataAirportCodeDoesNotExistInDatabaseException("C004-Iata airport code does not exist in database");
         }
         return flights;
     }
@@ -174,10 +165,43 @@ public class FlightServiceImpl implements FlightService {
         }
     }
 
-    private Optional<Integer> getNumberOfBaggageInPieces(TotalCargo totalCargo) {
+    private int getNumberOfDepartingBaggageInPiecesForIATACode(String iataAirportCode, List<Flight> flights) {
+        int numberOfDepartingBaggageInPieces;
+        numberOfDepartingBaggageInPieces = flights.stream()
+                .filter(flight -> flight.getDepartureAirportIATACode().equals(iataAirportCode))
+                .map(flight -> this.getNumberOfBaggageInPieces(flight.getTotalCargo()))
+                .reduce(Integer::sum).orElse(0);
+        return numberOfDepartingBaggageInPieces;
+    }
+
+    private int getNumberOfDepartingFlightsForIATACode(String iataAirportCode, List<Flight> flights) {
+        int numberOfDepartingFlights;
+        numberOfDepartingFlights = (int) flights.stream()
+                .filter(flight -> flight.getDepartureAirportIATACode().equals(iataAirportCode))
+                .count();
+        return numberOfDepartingFlights;
+    }
+
+    private int getNumberOfArrivingBaggageInPiecesForIATACode(String iataAirportCode, List<Flight> flights) {
+        int numberOfArrivingBaggageInPieces;
+        numberOfArrivingBaggageInPieces = flights.stream()
+                .filter(flight -> flight.getArrivalAirportIATACode().equals(iataAirportCode))
+                .map(flight -> this.getNumberOfBaggageInPieces(flight.getTotalCargo()))
+                .reduce(Integer::sum).orElse(0);
+        return numberOfArrivingBaggageInPieces;
+    }
+
+    private int getNumberOfArrivingFlightsForIATACode(String iataAirportCode, List<Flight> flights) {
+        return (int) flights.stream()
+                .filter(flight -> flight.getArrivalAirportIATACode().equals(iataAirportCode))
+                .count();
+    }
+
+    private int getNumberOfBaggageInPieces(TotalCargo totalCargo) {
         return totalCargo.getBaggage()
                 .stream()
                 .map(Baggage::getPieces)
-                .reduce(Integer::sum);
+                .reduce(Integer::sum)
+                .orElse(0);
     }
 }
