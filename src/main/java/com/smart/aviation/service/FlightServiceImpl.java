@@ -25,7 +25,6 @@ public class FlightServiceImpl implements FlightService {
 
     private final FlightDao flightDao;
 
-
     public void addFlights(FlightDto[] flightDtoArray) {
         for (FlightDto flightDto : flightDtoArray) {
             createFlight(flightDto);
@@ -104,7 +103,8 @@ public class FlightServiceImpl implements FlightService {
     private List<Flight> getFlightsOnCertainDate(List<Flight> flights, LocalDate requestedDepartureDate) {
         return flights.stream().filter(flight -> flight.getDepartureDate().getYear() == requestedDepartureDate.getYear()
                 && flight.getDepartureDate().getMonth() == requestedDepartureDate.getMonth()
-                && flight.getDepartureDate().getDayOfMonth() == requestedDepartureDate.getDayOfMonth()).collect(Collectors.toList());
+                && flight.getDepartureDate().getDayOfMonth() == requestedDepartureDate.getDayOfMonth())
+                .collect(Collectors.toList());
     }
 
     private List<Flight> getFlightsWithRequiredArrivalAndDepartureIATACode(String iataAirportCode) {
@@ -148,7 +148,6 @@ public class FlightServiceImpl implements FlightService {
                 .map(this::convertLbToKg)
                 .reduce(Double::sum)
                 .orElse(0d);
-
         return totalCargosWeightInKg;
     }
 
@@ -166,29 +165,23 @@ public class FlightServiceImpl implements FlightService {
     }
 
     private int getNumberOfDepartingBaggageInPiecesForIATACode(String iataAirportCode, List<Flight> flights) {
-        int numberOfDepartingBaggageInPieces;
-        numberOfDepartingBaggageInPieces = flights.stream()
+        return flights.stream()
                 .filter(flight -> flight.getDepartureAirportIATACode().equals(iataAirportCode))
                 .map(flight -> this.getNumberOfBaggageInPieces(flight.getTotalCargo()))
                 .reduce(Integer::sum).orElse(0);
-        return numberOfDepartingBaggageInPieces;
     }
 
     private int getNumberOfDepartingFlightsForIATACode(String iataAirportCode, List<Flight> flights) {
-        int numberOfDepartingFlights;
-        numberOfDepartingFlights = (int) flights.stream()
+        return (int) flights.stream()
                 .filter(flight -> flight.getDepartureAirportIATACode().equals(iataAirportCode))
                 .count();
-        return numberOfDepartingFlights;
     }
 
     private int getNumberOfArrivingBaggageInPiecesForIATACode(String iataAirportCode, List<Flight> flights) {
-        int numberOfArrivingBaggageInPieces;
-        numberOfArrivingBaggageInPieces = flights.stream()
+        return flights.stream()
                 .filter(flight -> flight.getArrivalAirportIATACode().equals(iataAirportCode))
                 .map(flight -> this.getNumberOfBaggageInPieces(flight.getTotalCargo()))
                 .reduce(Integer::sum).orElse(0);
-        return numberOfArrivingBaggageInPieces;
     }
 
     private int getNumberOfArrivingFlightsForIATACode(String iataAirportCode, List<Flight> flights) {
