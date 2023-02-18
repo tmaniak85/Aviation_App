@@ -31,45 +31,37 @@ class TotalCargoServiceImplTest {
     @Mock
     private TotalCargoDao totalCargoDao;
 
-    private Baggage baggage;
+    private final List<BaggageDto> baggageDtoList = new ArrayList<>();
 
-    private BaggageDto baggageDto;
+    private final List<CargoDto> cargoDtoList = new ArrayList<>();
 
-    private Cargo cargo;
+    private final List<Baggage> baggageList = new ArrayList<>();
 
-    private CargoDto cargoDto;
-
-    private List<BaggageDto> baggageDtoList = new ArrayList<>();
-
-    private List<CargoDto> cargoDtoList = new ArrayList<>();
-
-    private List<Baggage> baggageList = new ArrayList<>();
-
-    private List<Cargo> cargoList = new ArrayList<>();
+    private final List<Cargo> cargoList = new ArrayList<>();
 
     @BeforeEach
     void init() {
-        baggage = new Baggage();
+        Baggage baggage = new Baggage();
         baggage.setId(1);
-        baggage.setWeightUnit("lbs");
+        baggage.setWeightUnit("lb");
         baggage.setWeight(21);
         baggage.setPieces(5);
 
-        cargo = new Cargo();
+        Cargo cargo = new Cargo();
         cargo.setId(1);
-        cargo.setWeightUnit("lbs");
+        cargo.setWeightUnit("lb");
         cargo.setWeight(21);
         cargo.setPieces(5);
 
-        baggageDto = new BaggageDto();
+        BaggageDto baggageDto = new BaggageDto();
         baggageDto.setId(1);
-        baggageDto.setWeightUnit("lbs");
+        baggageDto.setWeightUnit("lb");
         baggageDto.setWeight(21);
         baggageDto.setPieces(5);
 
-        cargoDto = new CargoDto();
+        CargoDto cargoDto = new CargoDto();
         cargoDto.setId(1);
-        cargoDto.setWeightUnit("lbs");
+        cargoDto.setWeightUnit("lb");
         cargoDto.setWeight(21);
         cargoDto.setPieces(5);
 
@@ -83,8 +75,6 @@ class TotalCargoServiceImplTest {
     @Test
     void shouldCreateTotalCargoWithDefinedValuesFromTotalCargoDto() {
 //        given
-        TotalCargoService totalCargoService = new TotalCargoServiceImpl(totalCargoDao, cargoService, baggageService);
-
         TotalCargoDto totalCargoDto = new TotalCargoDto();
         totalCargoDto.setBaggage(baggageDtoList);
         totalCargoDto.setCargo(cargoDtoList);
@@ -95,12 +85,38 @@ class TotalCargoServiceImplTest {
         totalCargo.setCargo(cargoList);
         totalCargo.setFlightId(1L);
 
+        TotalCargoService totalCargoService = new TotalCargoServiceImpl(totalCargoDao, cargoService, baggageService);
+
         when(cargoService.addCargos(totalCargoDto)).thenReturn(cargoList);
         when(baggageService.addBaggage(totalCargoDto)).thenReturn(baggageList);
 //        when
         totalCargoService.createTotalCargo(totalCargoDto);
 //        then
         verify(totalCargoDao, times(1)).save(totalCargo);
+    }
+
+    @Test
+    void shouldCreateTotalCargoObjectsWithDefinedValuesFromArray() {
+//        given
+        TotalCargoDto totalCargoDto1 = new TotalCargoDto();
+        totalCargoDto1.setBaggage(baggageDtoList);
+        totalCargoDto1.setCargo(cargoDtoList);
+        totalCargoDto1.setFlightId(1L);
+        TotalCargoDto totalCargoDto2 = new TotalCargoDto();
+        totalCargoDto2.setBaggage(baggageDtoList);
+        totalCargoDto2.setCargo(cargoDtoList);
+        totalCargoDto2.setFlightId(2L);
+        TotalCargoDto[] totalCargoDtoArray = {totalCargoDto1, totalCargoDto2};
+
+        TotalCargoService totalCargoService = mock(TotalCargoServiceImpl.class);
+        doNothing().when(totalCargoService).createTotalCargo(any());
+        doCallRealMethod().when(totalCargoService).addTotalCargos(any());
+//        when
+        totalCargoService.addTotalCargos(totalCargoDtoArray);
+//        then
+        verify(totalCargoService, times(1)).createTotalCargo(totalCargoDto1);
+        verify(totalCargoService, times(1)).createTotalCargo(totalCargoDto2);
+        verify(totalCargoService, atMost(2)).createTotalCargo(any());
     }
 
     @AfterEach

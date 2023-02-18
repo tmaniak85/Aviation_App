@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class FlightController {
 
-    FlightService flightService;
-
+    private final FlightService flightService;
 
     @PostMapping
     public void addFlights(@RequestBody FlightDto[] flightDto) {

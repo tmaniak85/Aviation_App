@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class TotalCargoController {
 
-    TotalCargoService totalCargoService;
-
+    private final TotalCargoService totalCargoService;
 
     @PostMapping
     public void addTotalCargos(@RequestBody TotalCargoDto[] totalCargoDto) {

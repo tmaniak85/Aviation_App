@@ -31,12 +31,12 @@ class BaggageServiceImplTest {
     void init() {
         baggageDto = new BaggageDto();
         baggageDto.setId(1);
-        baggageDto.setWeightUnit("lbs");
+        baggageDto.setWeightUnit("lb");
         baggageDto.setWeight(21);
         baggageDto.setPieces(5);
         baggage = new Baggage();
         baggage.setId(1);
-        baggage.setWeightUnit("lbs");
+        baggage.setWeightUnit("lb");
         baggage.setWeight(21);
         baggage.setPieces(5);
         when(baggageDao.save(baggage)).thenReturn(baggage);

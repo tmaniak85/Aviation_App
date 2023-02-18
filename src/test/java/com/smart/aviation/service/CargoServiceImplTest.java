@@ -31,12 +31,12 @@ class CargoServiceImplTest {
     void init() {
         cargoDto = new CargoDto();
         cargoDto.setId(1);
-        cargoDto.setWeightUnit("lbs");
+        cargoDto.setWeightUnit("lb");
         cargoDto.setWeight(21);
         cargoDto.setPieces(5);
         cargo = new Cargo();
         cargo.setId(1);
-        cargo.setWeightUnit("lbs");
+        cargo.setWeightUnit("lb");
         cargo.setWeight(21);
         cargo.setPieces(5);
         when(cargoDao.save(cargo)).thenReturn(cargo);
