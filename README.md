@@ -7,6 +7,9 @@
 * Spring Boot
 * H2
 * Lombok
+* JUnit
+* Mockito
+* Hamcrest
 
 ### Tech stack (for checking functionality)
 * IntelliJ
