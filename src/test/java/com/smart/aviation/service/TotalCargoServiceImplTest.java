@@ -116,7 +116,7 @@ class TotalCargoServiceImplTest {
 //        then
         verify(totalCargoService, times(1)).createTotalCargo(totalCargoDto1);
         verify(totalCargoService, times(1)).createTotalCargo(totalCargoDto2);
-        verify(totalCargoService, atMost(2)).createTotalCargo(any());
+        verify(totalCargoService, times(2)).createTotalCargo(any());
     }
 
     @AfterEach
